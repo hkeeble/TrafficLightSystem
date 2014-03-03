@@ -7,6 +7,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -74,11 +77,22 @@ public class MainFrame extends JFrame implements KeyListener {
 		}
 	};
 	
+	/**
+	 * The event handler for closing the window. Stops the simulation and exits cleanly.
+	 */
+	public class WindowEventHandler extends WindowAdapter {
+		public void onWindowClosing() {
+			simulation.End();
+			System.exit(0);
+		}
+	}
+	
 	public MainFrame() {
 		// Initialize the JFrame
 		this.setVisible(false);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setTitle("Traffic Light System");
+		this.addWindowListener(new WindowEventHandler());
 		
 		// Initialize simulation variables
 		widthSetting = 0;
@@ -258,6 +272,16 @@ public class MainFrame extends JFrame implements KeyListener {
 	private void updateGUI() {
 		// Will likely loop through all grid text boxes and update the display accordingly.
 		System.out.println("GUI Update called.");
+		
+		Grid grid = simulation.getGrid();
+		
+		// Example - updates data within the grid using data from the simulation grid
+		for(int x = 0; x < widthSetting; x++) {
+			for(int y = 0; y < heightSetting; y++) {
+				int nCars = grid.Get(x, y).cars;
+				grid.Get(x, y).getTextField(Dir.CENTER).setText(Integer.toString(nCars));
+			}
+		}
 	}
 	
 	/**

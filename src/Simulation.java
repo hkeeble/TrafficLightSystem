@@ -39,6 +39,9 @@ public class Simulation {
 	public void Init(int width, int height) {
 		grid = new Grid(width, height);
 		
+		// Attemp server connection
+		Server.Connect();
+		
 		// Introduce cars here? e.g. grid.Get(0, 0).addCars(new Car[])?
 	}
 	
@@ -52,9 +55,10 @@ public class Simulation {
 	}
 	
 	/**
-	 * Stops the simulation timer
+	 * Stops the simulation timer and disconnects from the server.
 	 */
 	public void End() {
 		timer.cancel();
+		Server.Disconnect();
 	}
 }

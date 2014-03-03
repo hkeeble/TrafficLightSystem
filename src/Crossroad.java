@@ -9,8 +9,11 @@ public class Crossroad {
 
 	private CrossroadTextFields textFields;
 	
+	public int cars;
+	
 	public Crossroad() {
 		textFields = new CrossroadTextFields();
+		cars = 0;
 	}
 	
 	/**
