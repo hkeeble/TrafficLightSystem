@@ -56,7 +56,7 @@ public class Server {
 
 		System.out.println("Attempting to contact server...");
 		
-		Socket socket = new Socket();
+		socket = new Socket();
 
 		try {
 			socket.connect(new InetSocketAddress(name, port), timeout);
