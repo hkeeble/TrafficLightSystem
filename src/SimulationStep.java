@@ -1,32 +1,50 @@
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.Socket;
+import java.util.TimerTask;
 
-import javax.swing.SwingWorker;
+/**
+ * Represents a single simulation step.
+ * @author Henri
+ */
+public class SimulationStep extends TimerTask {
 
-
-public class SimulationStep extends SwingWorker<int[], Void> {
-
-	Grid grid; // The worker's reference to the simulation grid
+	Grid grid;
+	Server server;
+	boolean serverConnected;
 	
-	public SimulationStep(Grid grid) {
-		this.grid = grid;
+	/*
+	 * Constructor is used to obtain a reference to the grid, and the server
+	 */
+	public SimulationStep(Grid currentGrid, Server currentServer) {
+		grid = currentGrid;
+		server = currentServer;
 	}
 	
+	/**
+	 * Run will update both the server and simulation.
+	 */
 	@Override
-	protected int[] doInBackground() throws Exception {
-
-		// This is a single step of the simulation!
-		System.out.println("Simulation step called.");
-		
-		grid.Get(0, 0).cars++;
-		
-		// Ping the server (could be used to send/receieve data on each step?)
-		if(Server.isConnected())
-			Server.SendData("HELO");
-		
-		return null;
+	public void run() {
+		updateSimulation();
+		if(server.isConnected())
+			updateServer();
 	}
+
+	/**
+	 * Update simulation.
+	 */
+	private void updateSimulation() {
+		System.out.println("Simulation step called.");
+		grid.Get(0, 0).cars++;
+	}
+	
+	/**
+	 * Update the server.
+	 */
+	private void updateServer() {
+		System.out.println("Updating the server.");
+		
+		// PLACEHOLDER
+		server.SendData("HELO");
+		System.out.println(server.getData());
+	}
+	
 }

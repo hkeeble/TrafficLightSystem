@@ -1,29 +1,32 @@
 import java.util.Timer;
 import java.util.TimerTask;
 
-
+/**
+ * Represents the simulation itself.
+ * @author Henri
+ */
 public class Simulation {
 	
 	// The main grid of crossroads.
 	private Grid grid;
 	
-	// Swing worker - thread worker used to update the simulation in a background thread
-	private SimulationStep simStepWorker;
+	// Server constants
+	final String SERVER_NAME = "localhost";
+	final int SERVER_PORT = 5000;
+	final int SERVER_TIMEOUT = 1000;
+	
+	// The server
+	Server server;
 	
 	// The simulation's timers
 	private Timer timer;
 	private final int MS_BETWEEN_STEPS = 1000; // Number of milliseconds between each simulation step
 	
-	// The timer task, calls the simulation step worker thread to execute
-	private TimerTask simStepTask = new TimerTask(){
-
-		@Override
-		public void run() {
-			simStepWorker = new SimulationStep(grid);
-			simStepWorker.execute();
-		}
-		
-	};
+	/* 
+	 * The timer task for the simulation - a timer task is actually executed on it's own thread, so we don't need to have
+	 * a swing worker thread.
+	 */
+	private SimulationStep simStep;
 	
 	public Grid getGrid() {
 		return grid;
@@ -39,8 +42,12 @@ public class Simulation {
 	public void Init(int width, int height) {
 		grid = new Grid(width, height);
 		
-		// Attemp server connection
-		Server.Connect();
+		// Attempt server connection
+		server = new Server();
+		server.Connect(SERVER_NAME, SERVER_PORT, SERVER_TIMEOUT);
+		
+		// Initialize simulation step task thread
+		simStep = new SimulationStep(grid, server);
 		
 		// Introduce cars here? e.g. grid.Get(0, 0).addCars(new Car[])?
 	}
@@ -51,7 +58,7 @@ public class Simulation {
 	public void Start() {
 		// Initialize simulation timer
 		timer = new Timer();
-		timer.scheduleAtFixedRate(simStepTask, MS_BETWEEN_STEPS, MS_BETWEEN_STEPS);
+		timer.scheduleAtFixedRate(simStep, MS_BETWEEN_STEPS, MS_BETWEEN_STEPS);
 	}
 	
 	/**
@@ -59,6 +66,6 @@ public class Simulation {
 	 */
 	public void End() {
 		timer.cancel();
-		Server.Disconnect();
+		server.Disconnect();
 	}
 }
